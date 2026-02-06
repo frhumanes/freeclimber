@@ -94,7 +94,7 @@ def _configure():
     det_w, det_h = info.current_w, info.current_h
     pygame.display.quit()
 
-    ASPECT = _detect_aspect(det_w, det_h)
+    ASPECT = "4:3"
     DETAIL = _detect_detail(det_w, det_h, ASPECT)
 
     print("\n=== FreeClimber - Configuracion ===")

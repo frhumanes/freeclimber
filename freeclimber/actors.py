@@ -18,6 +18,9 @@ from random import random, randint, choice
 from glob import glob
 from math import ceil, floor
 from base64 import b64encode
+
+_FONT_BOLD = os.path.join(LINUX_GAME_PATH, 'fonts', 'GPUTEKSB.TTF')
+_FONT_LEVEL = os.path.join(LINUX_GAME_PATH, 'fonts', 'BASIF.TTF')
 #import socket
 from .building import Escalable, MetaWindow
 
@@ -87,11 +90,11 @@ class Status(Entity):
         if self.type == 'normal':
             r,g,b,a = colormap[color_player]
             invcolor = (255-r, 255-g, 255-b, 192)
-            self.position_font = GLFont(("/usr/share/fonts/truetype/ttf-larabie-deco/planetbe.ttf", int(width*0.5)),invcolor)
+            self.position_font = GLFont((_FONT_BOLD, int(width*0.5)),invcolor)
             self.position = TextEntity(self.position_font, "01")
             self.position.set(centerx= self.centerx, centery=self.centery ).place("info")
         elif self.type == 'mini':
-            self.position_font = GLFont(("/usr/share/fonts/truetype/ttf-larabie-deco/planetbe.ttf", int(width*0.45)),(225,225,255,192))
+            self.position_font = GLFont((_FONT_BOLD, int(width*0.45)),(225,225,255,192))
             self.position = TextEntity(self.position_font, "01")
             self.position.set(left = int(self.right*1.05), centery = self.centery+1).place("info")
         self.place('info')
@@ -176,7 +179,7 @@ class LifeBoard(Entity):
         self.marco = Entity(os.path.join(LINUX_GAME_PATH, 'images','common', 'status.png'))
         self.marco.set(centerx=self.right, centery=self.centery, scale=self.escala*1.1,alpha=190).place(LifeBoard.layer)
         self.place(LifeBoard.layer)
-        self.lifeboard = TextEntity(GLFont(("/usr/share/fonts/truetype/ttf-larabie-deco/worldofw.ttf", self.width//2),(255,0,0)), "x %d" % self.num)
+        self.lifeboard = TextEntity(GLFont((_FONT_BOLD, self.width//2),(255,0,0)), "x %d" % self.num)
         self.lifeboard.set(centerx= self.right+self.width//3, centery = self.centery).place(LifeBoard.layer)
 
     def set_lifes(self, num):
@@ -322,11 +325,9 @@ class Climber(Entity):
                 self.set(alpha=128)
             #self.do(AlphaFade(160,0.5))
         else:
-            score_font = GLFont(("/usr/share/fonts/truetype/ttf-larabie-uncommon/endless.ttf", self.width//2),(225,225,30))
-            shadow_font = GLFont(("/usr/share/fonts/truetype/ttf-larabie-uncommon/endless.ttf", self.width//2),(0,0,0,160))
-            #score_font = GLFont(("Wargames", self.width/2),(225,225,30))
-            #shadow_font = GLFont(("Wargames", self.width/2),(0,0,0,160))
-            position_font = GLFont(("/usr/share/fonts/truetype/ttf-larabie-deco/baveuse3.ttf", int(self.width*0.9)),(255,255,255))
+            score_font = GLFont((_FONT_BOLD, self.width//2),(225,225,30))
+            shadow_font = GLFont((_FONT_BOLD, self.width//2),(0,0,0,160))
+            position_font = GLFont((_FONT_LEVEL, int(self.width*0.9)),(255,255,255))
 
             self.scoreboard = TextEntity(score_font, "0")
             self.scoreshadow = TextEntity(shadow_font, "0")

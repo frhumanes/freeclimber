@@ -92,7 +92,7 @@ class Cloud(Entity):
             y = -randint(abs(maxy), abs(maxy*2))
         else:
             y = randint(0, maxy)
-        self.set(x=x, y=y)
+        self.set(x=x, y=y, alpha=randint(191, 230))
 
 class Sky(Scene):
 

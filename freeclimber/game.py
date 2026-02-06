@@ -137,7 +137,7 @@ class Game(Scene):
             self.pausedbg = Entity(os.path.join(LINUX_GAME_PATH, 'images','common', 'paused.png'), hotspot=(0,0))
             self.pausedbg.set(x=0,y=0,scale=max(SELECTED_RESOLUTION), alpha=165).place('pausa')
             self.pausedbg.do(Hide())
-            self.pausedmsg = TextEntity(GLFont(("/usr/share/fonts/truetype/ttf-larabie-deco/qswitcha.ttf", SELECTED_RESOLUTION[0]//10),(255,255,255)), "PAUSA")
+            self.pausedmsg = TextEntity(GLFont((_GPUTEK_FONT, SELECTED_RESOLUTION[0]//10),(255,255,255)), "PAUSA")
             self.pausedmsg.set(centerx=SELECTED_RESOLUTION[0]//2, centery=SELECTED_RESOLUTION[1]//2).place("pausa")
             self.pausedmsg.do(Hide())
 
@@ -154,7 +154,7 @@ class Game(Scene):
         elif self.i == 7 and self.demo_mode:
             self.msg.set_text("Cargando IA...")
             self.msg.set(centerx=SELECTED_RESOLUTION[0]//2, centery=SELECTED_RESOLUTION[1]//2).place("load")
-            self.mensaje = TextEntity(GLFont(("/usr/share/fonts/truetype/ttf-larabie-straight/primerb.ttf", SELECTED_RESOLUTION[0]//24),(255,165,0)), "Modo DEMO")
+            self.mensaje = TextEntity(GLFont((_GPUTEK_FONT, SELECTED_RESOLUTION[0]//24),(255,165,0)), "Modo DEMO")
             self.mensaje.set(right=SELECTED_RESOLUTION[0]*39//40, bottom=SELECTED_RESOLUTION[1]*39//40).place("info")
             self.mensaje.do(Blink(0.5, 0.25))
             now = pygame.time.get_ticks()
