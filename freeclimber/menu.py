@@ -41,7 +41,7 @@ class MenuAnimation(Entity):
                  centery=int(SELECTED_RESOLUTION[1] * 0.55),
                  scale=anim_scale, alpha=0)
         if frames:
-            self.do(Animate(frames, secs=3.0, mode=RepeatMode))
+            self.do(Animate(frames, secs=1.5, mode=RepeatMode))
         self.do(AlphaFade(255, 1.5))
 
 

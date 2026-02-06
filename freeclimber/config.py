@@ -20,7 +20,7 @@ from time import time
 import pygame
 pygame.mixer.pre_init(44100, -16, 2, 3702)
 
-VERSION = '0.5'
+VERSION = '0.9.1'
 
 import gettext
 

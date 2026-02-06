@@ -99,7 +99,7 @@ class Game(Scene):
             if VOLUME:
                 try:
                     pygame.mixer.music.stop()
-                    pygame.mixer.music.set_volume(VOLUME*0.008)
+                    pygame.mixer.music.set_volume(VOLUME * 0.01)
                     pygame.mixer.music.load(os.path.join(LINUX_GAME_PATH, MUSIC_PATH, 'juego0.ogg'))
                     pygame.mixer.music.play()
                     pygame.mixer.music.set_endevent(ENDMUSICEVENT)
@@ -461,6 +461,7 @@ class Game(Scene):
                         pygame.mixer.music.load(os.path.join(LINUX_GAME_PATH, MUSIC_PATH, 'juego2.ogg'))
                     else:
                         pygame.mixer.music.load(os.path.join(LINUX_GAME_PATH, MUSIC_PATH, 'juego1.ogg'))
+                    pygame.mixer.music.set_volume(VOLUME * 0.01)
                     pygame.mixer.music.play()
             except:
                 formatExceptionInfo()

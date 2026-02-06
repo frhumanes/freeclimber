@@ -294,7 +294,7 @@ class Climber(Entity):
                         'waitright': Wait([resources.get_bitmap(e) for e in waitright], 0.5, mode = PingPongMode),\
                         'fall': Animate([resources.get_bitmap(e) for e in fall], 0.5, mode = PingPongMode),\
                         'winner': Animate([resources.get_bitmap(e) for e in final], 0.5)+Animate([resources.get_bitmap(e) for e in winner], 0.5, mode = PingPongMode),\
-                        'parachute': Repeat(Animate([resources.get_bitmap(e) for e in fall], 0.5),times = 2) + Animate([resources.get_bitmap(e) for e in parachute], 0.5) + RotateDelta(20,0.5,PingPongMode)
+                        'parachute': Repeat(Animate([resources.get_bitmap(e) for e in fall], 0.5),times = 2) + Wait([resources.get_bitmap(e) for e in parachute], 0.5) + RotateDelta(20,0.5,PingPongMode)
                         }
 
         self.movements={'up1left': MoveDelta(0, ceil(-self.altura/2.0), 0.4)+Delay(0.1),\
@@ -325,9 +325,9 @@ class Climber(Entity):
                 self.set(alpha=128)
             #self.do(AlphaFade(160,0.5))
         else:
-            score_font = GLFont((_FONT_BOLD, self.width//2),(225,225,30))
-            shadow_font = GLFont((_FONT_BOLD, self.width//2),(0,0,0,160))
-            position_font = GLFont((_FONT_LEVEL, int(self.width*0.9)),(255,255,255))
+            score_font = GLFont((_FONT_BOLD, self.width//3),(225,225,30))
+            shadow_font = GLFont((_FONT_BOLD, self.width//3),(0,0,0,160))
+            position_font = GLFont((_FONT_LEVEL, int(self.width*0.65)),(255,255,255))
 
             self.scoreboard = TextEntity(score_font, "0")
             self.scoreshadow = TextEntity(shadow_font, "0")
@@ -340,9 +340,9 @@ class Climber(Entity):
             self.scoremarco.set(right=SELECTED_RESOLUTION[0], centery=self.scoreboard.centery)
             self.scoreshadow.set(x= self.scoreboard.x+2, y = self.scoreboard.y+2)
 
-            self.lifeboard = LifeBoard(x = SELECTED_RESOLUTION[0]-self.width*1.25, y = self.scoreboard.bottom+self.scoreboard.height*6//5, width = int(self.width*0.75))
+            self.lifeboard = LifeBoard(x = SELECTED_RESOLUTION[0]-self.width*1.0, y = self.scoreboard.bottom+self.scoreboard.height, width = int(self.width*0.55))
 
-            self.levelboard= Status(width=width*1.15, color_player = self.color_player, type = 'normal')
+            self.levelboard= Status(width=width*0.85, color_player = self.color_player, type = 'normal')
             #self.ghost = Status(x=SELECTED_RESOLUTION[0]-100,y=500,width=width, color_player = 'blue', type = 'ghost')
             #self.mini =  Status(width=int(width*0.75), color_player = 'green', type = 'mini')
 
@@ -481,13 +481,15 @@ class Climber(Entity):
                 self.update()
                 self.manos = 2
         elif movement == 'hit':
-            if self.manos == 2:
+            if self.manos == 2 and not self.ismoving():
+                # En espera: primer golpe, pierde una mano
                 self.do(self.animations['waitleft'])
                 self.last_movement = 'hit'
                 self.score -= 200
                 self.update()
                 self.manos = 1
-            elif self.manos == 1:
+            else:
+                # Escalando o ya con una mano: caida
                 movement = None
                 self.move('fall', stage)
                 #self.last_movement = "fall"
@@ -514,48 +516,48 @@ class Climber(Entity):
 
     def auto_move(self, stage):
         f, w = self.level, self.window
-        delay = randint(750,1500)
+        delay = randint(1000,2000)
         if self.last_movement == 'up1right' and f < len(stage) and stage[-f-1][w].isescalable():
             if stage[-f][w].ismoving():
                 self.move('down')
             else:
                 self.move('up_left')
-            delay = randint(625,900)
+            delay = randint(900,1500)
         elif self.last_movement == 'up1left' and f < len(stage) and stage[-f-1][w].isescalable():
             if stage[-f][w].ismoving():
                 self.move('down')
             else:
                 self.move('up_right')
-            delay = randint(625,900)
+            delay = randint(900,1500)
         elif isinstance(stage[-f][w], MetaWindow) and stage[-f][w].ismoving():
             if not self.last_movement and w < len(stage[1])-1 and stage[-f][w+1].isescalable():
                 self.move('right')
-                delay = randint(900,1500)
+                delay = randint(1200,2000)
             elif not self.last_movement and w > 1 and stage[-f][w-1].isescalable():
                 self.move('left')
-                delay = randint(900,1500)
+                delay = randint(1200,2000)
             elif f > 1 and isinstance(stage[-f+1][w], Escalable) and stage[-f+1][w].isescalable():
                 self.move('down')
-                delay = randint(750,1300)
+                delay = randint(1000,1800)
         elif self.last_movement == 'up2right':
             self.move('up_left')
-            delay = randint(750,1500)
+            delay = randint(1000,2000)
         elif self.last_movement == 'up2left' or self.last_movement == 'hit':
             self.move('up_right')
-            delay = randint(750,1500)
+            delay = randint(1000,2000)
         elif self.last_movement is None:
             if f < len(stage) and isinstance(stage[-f-1][w], Escalable) and stage[-f-1][w].isescalable() and not stage[-f-1][w].ismoving():
                 self.move('up_right')
-                delay = randint(550,900)
+                delay = randint(800,1500)
             elif w > 1 and isinstance(stage[-f][w-1], Escalable) and stage[-f][w-1].isescalable():
                 self.move('left')
-                delay = randint(900,1500)
+                delay = randint(1200,2000)
             elif w < len(stage[1])-1 and isinstance(stage[-f][w+1], Escalable) and stage[-f][w+1].isescalable():
                 self.move('right')
-                delay = randint(900,1500)
+                delay = randint(1200,2000)
             elif f > 1 and isinstance(stage[-f+1][w], Escalable) and isinstance(stage[-f+1][w], Escalable) and stage[-f+1][w].isescalable():
                 self.move('down')
-                delay = randint(750,1300)
+                delay = randint(1000,1800)
         elif self.last_movement == 'fall':
             pass
         return delay
