@@ -281,7 +281,7 @@ class MetaObstacle(Escalable):
     def __init__(self, x, y, width = None, height = None, theme='default'):
         Escalable.__init__(self, x=x, y=y, width=width, height=height, theme=theme)
         self.entities['window'] = StaticOsbtacle(x=self.x, y=self.y, escala=self.escala, theme=self.theme)
-        self.entities['item'] = StaticOsbtacleEffect(x=self.x, y=self.y, escala=self.escala, theme=self.theme)
+        self.entities['item'] = StaticOsbtacleEffect(x=self.x, y=self.y, escala=self.escala, theme=self.theme, step=self.width, vstep=self.height)
 
     def isescalable(self):
         return False
@@ -448,25 +448,58 @@ class StaticOsbtacleEffect(Entity):
     image = os.path.join(LINUX_GAME_PATH, 'images','stages','default','dummy.png')
     layer = "actors"
 
-    def init(self, x, y,escala = 1, theme='default'):
+    # Sentido horario: N, NE, E, SE, S, SW, W, NW
+    _DIRECTIONS = ((0,-1),(1,-1),(1,0),(1,1),(0,1),(-1,1),(-1,0),(-1,-1))
+
+    def init(self, x, y, escala=1, theme='default', step=0, vstep=0):
         self.set(x=x, y=y, scale=escala)
+        self.step = step
+        self.vstep = vstep
+        self.escala = escala
         anim = glob.glob(os.path.join(LINUX_GAME_PATH, 'images','stages', theme, 'sefx_*.png'))
         anim.sort()
         anim.append(StaticOsbtacleEffect.image)
-        self.effect = Animate([resources.get_bitmap(e) for e in anim],0.55)
-        anim2 = glob.glob(os.path.join(LINUX_GAME_PATH, 'images','stages', theme, 'ray_*.png'))
-        anim2.sort()
-        anim2.append(StaticOsbtacleEffect.image)
-        self.effect2 = Animate([resources.get_bitmap(e) for e in anim2],0.55)
-        self.n = 0
+        self._sefx_frames = [resources.get_bitmap(e) for e in anim]
+        ray_files = glob.glob(os.path.join(LINUX_GAME_PATH, 'images','stages', theme, 'ray_*.png'))
+        ray_files.sort()
+        self._ray_frames = [resources.get_bitmap(e) for e in ray_files]
+        self._dir_idx = 0
+        self._cycle(0)
+
+    def _cycle(self, n=0):
+        speeds = [0.55, 0.40, 0.25]
+        speed = speeds[min(n, 2)]
+        if n >= 2:
+            self.do(Animate(self._sefx_frames, speed)
+                    + CallFunc(self._spawn_ray)
+                    + Delay(0.5)
+                    + CallFunc(self._cycle, 0))
+        else:
+            self.do(Animate(self._sefx_frames, speed)
+                    + CallFunc(self._cycle, n + 1))
+
+    def _spawn_ray(self):
+        if not self._ray_frames or not self.step:
+            return
+        dx, dy = self._DIRECTIONS[self._dir_idx]
+        self._dir_idx = (self._dir_idx + 1) % 8
+        ray = Entity()
+        ray.set(x=self.x + dx * self.step, y=self.y + dy * self.vstep, scale=self.escala)
+        ray.place("actors")
+        ray.active = True
+        ray.destroyed = False
+        ray.destroy = lambda d=0: _destroy_ray(ray)
+        ray.add_collnode("enemy", radius=56 * self.escala)
+        ray.do(Animate(self._ray_frames, 0.55) + Delete())
 
     def fx(self):
-        self.n += 1
-        if self.n == 5:
-            self.do(self.effect+self.effect2)
-            self.n = 0
-        else:
-            self.do(self.effect)
+        pass
+
+
+def _destroy_ray(ray):
+    ray.destroyed = True
+    ray.abort_actions()
+    ray.do(AlphaFade(0, 0.2) + Delete())
 
 
 class Bonus(Entity):
@@ -723,7 +756,7 @@ class Stage:
                     if j == self.dim[0]-1:
                         floor.append(9)
                     else:
-                        if not no_mas_obstaculos and not randint(self.dim[1]*(24//DIF)):
+                        if not no_mas_obstaculos and 3 <= i <= self.dim[1]-3 and not randint(self.dim[1]*(24//DIF)):
                             floor.append(0)
                             no_mas_obstaculos = True
                         else:
@@ -732,7 +765,7 @@ class Stage:
                     if j == 0:
                         floor.append(4)
                     else:
-                        if not no_mas_obstaculos and not randint(self.dim[1]*(12//DIF)):
+                        if not no_mas_obstaculos and 2 <= i <= self.dim[1]-4 and not randint(self.dim[1]*(12//DIF)):
                             floor.append(0)
                             no_mas_obstaculos = True
                         else:
@@ -746,7 +779,7 @@ class Stage:
                     if j == 0:
                         floor.append(4)
                     else:
-                        if not no_mas_obstaculos and not randint(self.dim[1]*(12//DIF)):
+                        if not no_mas_obstaculos and 3 <= i <= self.dim[1]-3 and not randint(self.dim[1]*(12//DIF)):
                             floor.append(0)
                             no_mas_obstaculos = True
                         else:
@@ -771,8 +804,6 @@ class Stage:
                         e.entities['item'].activate()
                     if not randint(0,2000):
                         e.lights()
-                elif isinstance(e, MetaObstacle) and (e.y > 0 and e.y < SELECTED_RESOLUTION[1]) and not randint(0,100):
-                    e.entities['item'].fx()
 
 
 class Building(Scene):
