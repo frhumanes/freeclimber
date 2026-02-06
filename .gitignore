@@ -1,0 +1,36 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Configuración/archivos de herramientas locales
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+.hypothesis/
+
+# Archivos de construcción / distribución
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Archivos temporales del editor/OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Archivos generados de documentación
+doc/_build/
+
+# Archivos de logs temporales
+*.log
